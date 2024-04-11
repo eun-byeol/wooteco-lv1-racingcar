@@ -1,9 +1,10 @@
 package racingcar.domain;
 
-import static racingcar.constant.ExceptionMessage.INVALID_ROUND_FORMAT;
-import static racingcar.constant.ExceptionMessage.INVALID_ROUND_RANGE;
-
 public class Round {
+
+    private static final int MIN_ROUND_COUNT = 1;
+    private static final String INVALID_ROUND_RANGE = "시도 횟수는 1 이상 입력해 주세요.";
+    private static final String INVALID_ROUND_FORMAT = "시도 횟수는 숫자만 입력해 주세요.";
     private int count;
 
     public Round(String count) {
@@ -11,17 +12,17 @@ public class Round {
         validateCountRange();
     }
 
-    private void validateCountRange() {
-        if (count < 1) {
-            throw INVALID_ROUND_RANGE.getException();
-        }
-    }
-
     private int tryConvertRoundCount(String count) {
         try {
             return Integer.parseInt(count);
         } catch(NumberFormatException e) {
-            throw INVALID_ROUND_FORMAT.getException();
+            throw new IllegalArgumentException(INVALID_ROUND_FORMAT);
+        }
+    }
+
+    private void validateCountRange() {
+        if (count < MIN_ROUND_COUNT) {
+            throw new IllegalArgumentException(INVALID_ROUND_RANGE);
         }
     }
 

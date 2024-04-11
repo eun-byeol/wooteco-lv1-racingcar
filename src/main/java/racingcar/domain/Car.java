@@ -1,14 +1,10 @@
 package racingcar.domain;
 
-import static racingcar.constant.ExceptionMessage.DUPLICATED_CAR_NAME;
-import static racingcar.constant.ExceptionMessage.INVALID_CAR_NAME_LENGTH;
-
-import java.util.List;
-import racingcar.dto.CarPerformance;
-
 public class Car {
 
-    private static final int REQUIRED_OIL = 4;
+    private static final int MAX_LENGTH_OF_NAME = 5;
+    private static final int REQUIRED_NUMBER_OF_POWER = 4;
+    private static final String INVALID_CAR_NAME_LENGTH = "이름은 1자 이상 5자 이내로 입력해 주세요.";
     private final String name;
     private int movedDistance = 0;
 
@@ -18,47 +14,26 @@ public class Car {
     }
 
     private void validateNameLength(String name) {
-        if (name.length() > 5 || name.isEmpty()) {
-            throw INVALID_CAR_NAME_LENGTH.getException();
+        if (name.length() > MAX_LENGTH_OF_NAME || name.isEmpty()) {
+            throw new IllegalArgumentException(INVALID_CAR_NAME_LENGTH);
         }
     }
 
-    public static void validateUniqueCarNames(List<Car> cars) {
-        int uniqueCarNamesCount = (int)cars.stream()
-                .map(car -> car.name)
-                .distinct()
-                .count();
-
-        if (uniqueCarNamesCount != cars.size()) {
-            throw DUPLICATED_CAR_NAME.getException();
-        }
-    }
-
-    public void goIfOilEnough(int oil) {
-        if (oil >= REQUIRED_OIL) {
+    public void goIfNumberOfPowerEnough(int numberOfPower) {
+        if (numberOfPower >= REQUIRED_NUMBER_OF_POWER) {
             movedDistance++;
         }
-    }
-
-    public CarPerformance getCurrentPerformance() {
-        return new CarPerformance(name, movedDistance);
     }
 
     public boolean isSameDistance(int distance) {
         return distance == movedDistance;
     }
 
-    public static int findMaxDistance(List<Car> cars) {
-        return cars.stream()
-                .mapToInt(car -> car.movedDistance)
-                .max()
-                .getAsInt();
+    public String getName() {
+        return name;
     }
 
-    public static List<String> mapCarsToName(List<Car> cars) {
-        return cars.stream()
-                .map(car -> car.name)
-                .toList();
+    public int getMovedDistance() {
+        return movedDistance;
     }
-
 }

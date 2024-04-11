@@ -3,33 +3,38 @@ package racingcar.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import racingcar.domain.Car;
+import racingcar.domain.Cars;
 import racingcar.domain.Round;
 import racingcar.dto.RoundResult;
-import racingcar.service.RacingcarService;
+import racingcar.service.RacingGameService;
+
 import racingcar.view.InputView;
 import racingcar.view.OutputView;
 
 public class RacingcarController {
+
     private final InputView inputView = new InputView();
     private final OutputView outputView = new OutputView();
-    private final RacingcarService racingcarService = new RacingcarService();
+    private final RacingGameService racingcarService = new RacingGameService();
 
     public void run() {
-        List<Car> cars = retryOnException(this::readCars);
+        Cars cars = retryOnException(this::readCars);
         Round round = retryOnException(this::readRound);
 
         List<RoundResult> roundResults = simulateCarsInRound(round, cars);
         awardWinners(cars, roundResults);
     }
 
-    private void awardWinners(List<Car> cars, List<RoundResult> roundResults) {
-        List<String> winners = racingcarService.pickOutWinners(cars);
-        outputView.printRoundResults(roundResults);
-        outputView.printWinners(winners);
+    private Cars readCars() {
+        List<String> carNames = inputView.readCarNames();
+        return racingcarService.registerCars(carNames);
     }
 
-    private List<RoundResult> simulateCarsInRound(Round round, List<Car> cars) {
+    private Round readRound() {
+        return new Round(inputView.readTryCount());
+    }
+
+    private List<RoundResult> simulateCarsInRound(Round round, Cars cars) {
         List<RoundResult> roundResults = new ArrayList<>();
         while (round.isRemain()) {
             RoundResult roundResult = racingcarService.processRound(cars);
@@ -39,13 +44,10 @@ public class RacingcarController {
         return roundResults;
     }
 
-    private List<Car> readCars() {
-        List<String> carNames = inputView.readCarNames();
-        return racingcarService.createCars(carNames);
-    }
-
-    private Round readRound() {
-        return new Round(inputView.readTryCount());
+    private void awardWinners(Cars cars, List<RoundResult> roundResults) {
+        List<String> winners = racingcarService.pickOutWinners(cars);
+        outputView.printRoundResults(roundResults);
+        outputView.printWinners(winners);
     }
 
     public <T> T retryOnException(Supplier<T> retryOperation) {
