@@ -17,4 +17,3 @@ public enum ViewMessage {
 	public String getMessage() {
 		return message;
 	}
-}
